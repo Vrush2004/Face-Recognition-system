@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students Detail</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/student.css">
+</head>
+<body>
+    <section class="main">
+        <header class="header">
+                <div class="logo-container">
+                    <a href="./index.html">
+                        <img src="../static/images/logo1.png" alt="Logo" class="navbar-logo">
+                    </a>
+                </div>
+                <div class="nav-menu">
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('about') }}">About</a>
+                    <a href="{{ url_for('dataset')}}">Dataset</a>
+                    <a href="{{ url_for('developer') }}">Developer</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+        </header>
+        <main>
+            <h1 class="heading">Students Dashboard</h1>
+            <div class="main-content">
+                <!-- Left Section -->
+                <div class="left-section">
+                    <h2 class="h2-heading">Add New Student Details</h2>
+                    <!-- <img src="./images/students.jpg" alt="Students" class="left-img"> -->
+                    <!-- Student Information -->
+                    <form class="student-info" id="student-info" action="/add_data">
+                        <div class="form_info">
+                            <input type="text" id="std_id" name="std_id" placeholder="Enter Student ID">
+                            <input type="text" id="roll" name="roll" placeholder="Enter Roll No">
+                        </div>
+
+                        <input type="text" id="std_name" name="std_name" placeholder="Enter Student Name">
+    
+                        <div class="form_info">
+                            <input type="email" id="email" name="email" placeholder="Enter Email">
+                            <input type="tel" id="phone" name="phone" placeholder="Enter Phone Number">
+                        </div>
+                        
+                        <input type="text" id="address" name="address" placeholder="Enter Address">
+
+                        <div class="form_info">
+                            <select id="gender" name="gender">
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Other</option>
+                            </select>
+                            <input type="date" id="dob" name="dob" placeholder="Birth Date">
+                        </div>
+
+                        <div class="form_info">
+                            <select id="dep" name="dep">
+                                <option>Select Department</option>
+                                <option>Computer</option>
+                                <option>IT</option>
+                                <option>Civil</option>
+                                <option>Mechanical</option>
+                                <option>E&TC</option>
+                            </select>
+                            <select id="course" name="course">
+                                <option>Select Course</option>
+                                <option>FE</option>
+                                <option>SE</option>
+                                <option>TE</option>
+                                <option>BE</option>
+                            </select>
+                        </div>
+    
+                        <div class="form_info">
+                            <select id="year" name="year">
+                                <option>Select Year</option>
+                                <option>2021-22</option>
+                                <option>2022-23</option>
+                                <option>2023-24</option>
+                                <option>2024-25</option>
+                            </select>
+                            <select id="semester" name="semester">
+                                <option>Select Semester</option>
+                                <option>Semester-1</option>
+                                <option>Semester-2</option>
+                            </select>
+                        </div>
+    
+                        <div class="photo-sample">
+                            <div class="photo-label">
+                                <label>Photo</label>
+                                <label>Sample:</label>
+                            </div>
+                            <input type="radio" id="photo-yes" name="photo" value="yes">
+                            <label for="yes">Yes</label>
+                            <input type="radio" id="photo-no" name="photo" value="no">
+                            <label for="no">No</label>
+                        </div>                        
+                    </form>
+                     <!-- Buttons -->
+                     <div class="button-group">
+                        <button id="saveButton">Save</button>
+                        <button id="updateBtn">Update</button>
+                        <button id="deleteButton">Delete</button>
+                        <button id="resetButton">Reset</button>
+                    </div>
+                    <div class="button-group">
+                        <button id="take-photo" disabled>Take Photo Sample</button>
+                        <button id="update-photo" disabled>Update Photo Sample</button>
+                    </div>
+                </div>
+
+                <div id="camera-overlay" class="overlay" style="display:none;">
+                    <div class="camera-container">
+                        <video id="video" width="450" height="240" autoplay></video>
+                        <canvas id="canvas" style="display:none"></canvas>
+                        <div class="camera-btn-div">
+                            <button id="closeCameraButton" class="camera-btn">Close Camera</button>
+                            <button id="capture-button" class="camera-btn">Capture Photo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-frame">
+                    
+                    <h2 class="h2-heading">Student Details</h2>
+                    <!-- Search System -->
+                    <div class="search-system">
+                        <label for="searchBy">Search By:</label>
+                        <select id="searchBy" class="search-select">
+                            <option value="Select">Select</option>
+                            <option value="RollNo">RollNo</option>
+                            <option value="Phone No">Phone No</option>
+                        </select>
+                        <input type="text" id="searchEntry" class="search-entry" placeholder="Enter search term">
+                        <div class="btn-container">
+                            <button class="search-btn" id="searchButton">Search</button>
+                            <button class="search-btn" id="showAllButton">Show All</button>
+                        </div>
+                    </div>
+        
+                    <!-- Table -->
+                    <div class="table-container">
+                        <table id="studentTable">
+                            <thead>
+                                <tr>
+                                    <th>StudentID</th>
+                                    <th>RollNo</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Gender</th>
+                                    <th>DOB</th>
+                                    <th>Semester</th>
+                                    <th>Department</th>
+                                    <th>Course</th>
+                                    <th>Year</th>
+                                    <th>PhotoSamples</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <script>
+       // Fetch and render all students on page load
+        function loadStudents() {
+            fetch('/get_students')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const students = data.data;
+                        const tableBody = document.querySelector('#studentTable tbody');
+                        
+                        // Clear the table before adding rows to avoid duplicates
+                        tableBody.innerHTML = '';
+
+                        students.forEach(student => {
+                            addStudentRow(student); // Add each student to the table
+                        });
+                    } else {
+                        console.error('Error fetching student data:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error fetching students:', error));
+        }
+
+        // Add a new student row to the table
+        function addStudentRow(studentData) {
+            const tableBody = document.querySelector('#studentTable tbody');
+            
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${studentData.std_id}</td>
+                <td>${studentData.roll}</td>
+                <td>${studentData.std_name}</td>
+                <td>${studentData.email}</td>
+                <td>${studentData.phone}</td>
+                <td>${studentData.address}</td>
+                <td>${studentData.gender}</td>
+                <td>${studentData.dob}</td>
+                <td>${studentData.dep}</td>
+                <td>${studentData.course}</td>
+                <td>${studentData.year}</td>
+                <td>${studentData.semester}</td>
+                <td>${studentData.photo}</td>
+            `;
+            
+            tableBody.appendChild(newRow);
+        }
+
+        // Save new student data
+        document.getElementById('saveButton').addEventListener('click', function () {
+            const form = document.getElementById('student-info');
+            const formData = new FormData(form);
+
+            let formObj = {};
+            formData.forEach((value, key) => {
+                formObj[key] = value;
+            });
+
+            fetch('/add_data', {
+                method: 'POST',
+                body: JSON.stringify(formObj),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Student data added successfully!');
+                    document.getElementById('student-info').reset();
+
+                    // Add the new row to the table
+                    addStudentRow(data.student);
+
+                    // Optionally, reload the data from the server
+                    loadStudents();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Event listener for clicking on rows to edit data
+        document.querySelector('#studentTable tbody').addEventListener('click', function (event) {
+            const row = event.target.closest('tr');
+            if (row) {
+                const rollNumber = row.children[1].innerText; // Get roll number
+                if (rollNumber) {
+                    fetch(`/get_students`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const student = data.data.find(stud => stud.roll == rollNumber);
+                                if (student) {
+                                    const form = document.getElementById('student-info');
+                                    form.elements['std_id'].value = student.std_id || '';
+                                    form.elements['roll'].value = student.roll || '';
+                                    form.elements['std_name'].value = student.std_name || '';
+                                    form.elements['email'].value = student.email || '';
+                                    form.elements['phone'].value = student.phone || '';
+                                    form.elements['address'].value = student.address || '';
+                                    form.elements['gender'].value = student.gender || '';
+                                    form.elements['dob'].value = student.dob || '';
+                                    form.elements['dep'].value = student.dep || '';
+                                    form.elements['course'].value = student.course || '';
+                                    form.elements['year'].value = student.year || '';
+                                    form.elements['semester'].value = student.semester || '';
+                                    form.elements['photo-no'].value = student.photo || '';
+                                } else {
+                                    alert('Student not found');
+                                }
+                            } else {
+                                alert(data.error || 'Error fetching data');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+            }
+        });
+
+        // Call the loadStudents function when the page loads
+        window.onload = loadStudents;
+        
+        // Update button functionality
+        document.getElementById('updateBtn').addEventListener('click', function () {
+            const form = document.getElementById('student-info');
+            const formData = new FormData(form);
+
+            let formObj = {};
+            formData.forEach((value, key) => {
+                formObj[key] = value;
+            });
+
+            // Send the updated data to the server
+            fetch('update_data', {
+                method: 'POST',
+                body: JSON.stringify(formObj),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Success alert
+                    if (confirm('Student data updated successfully!')) {
+                        // Get the updated student data from the server response
+                        const stu = data.student; // assuming the server sends the updated student object
+
+                        // Find the row by student std_id (not using data-id)
+                        const rows = document.querySelectorAll('tr');
+                        let rowToUpdate = null;
+
+                        // Loop through all rows to find the row with matching std_id
+                        rows.forEach(row => {
+                            const std_id = row.cells[0]?.textContent; // Assuming std_id is in the first column
+                            if (std_id == stu.std_id) {
+                                rowToUpdate = row;
+                            }
+                        });
+
+                        if (rowToUpdate) {
+                            // Update the row with the new student data
+                            rowToUpdate.innerHTML = `
+                                <td>${stu.std_id}</td>
+                                <td>${stu.roll}</td>
+                                <td>${stu.std_name}</td>
+                                <td>${stu.email}</td>
+                                <td>${stu.phone}</td>
+                                <td>${stu.address}</td>
+                                <td>${stu.gender}</td>
+                                <td>${stu.dob}</td>
+                                <td>${stu.dep}</td>
+                                <td>${stu.course}</td>
+                                <td>${stu.year}</td>
+                                <td>${stu.semester}</td>
+                                <td>${stu.photo}</td>
+                            `;
+                        }
+
+                        // Reset the form
+                        form.reset();
+                    }
+                } else {
+                    alert('Error updating data: ' + data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+
+        // Delete button functionality
+        document.getElementById('deleteButton').addEventListener('click', () => {
+            // Get the student ID from the form
+            const studentId = document.getElementById('std_id').value;
+
+            // Ensure a student is selected
+            if (!studentId) {
+                alert('Please select a student to delete!');
+                return;
+            }
+
+            // Confirm deletion
+            if (!confirm('Are you sure you want to delete the selected student?')) {
+                return;
+            }
+
+            // Send DELETE request to the backend
+            fetch(`/delete_data/${studentId}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Find the table row dynamically using the student ID
+                        const tableRow = document.querySelector(`#studentTable tr[data-id="${studentId}"]`);
+                        if (tableRow) {
+                            tableRow.parentNode.removeChild(tableRow); // Remove the row from the table
+                        }
+
+                        // Reset the form
+                        document.getElementById('student-info').reset();
+
+                        alert('Student deleted successfully!');
+                    } else {
+                        alert('Error deleting student: ' + data.error);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Failed to delete the student due to a server issue.');
+                });
+        });
+
+
+        document.getElementById('resetButton').addEventListener('click', () => {
+            document.getElementById('student-info').reset();
+        });
+
+        document.getElementById('searchButton').addEventListener('click', () => {
+            const searchBy = document.getElementById('searchBy').value;
+            const searchTerm = document.getElementById('searchEntry').value;
+
+            console.log(`Search By: ${searchBy}, Search Term: ${searchTerm}`); // Log values
+
+            fetch(`/search_data?searchBy=${searchBy}&searchTerm=${searchTerm}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response:', data); // Log backend response
+                    const tbody = document.querySelector('#studentTable tbody');
+                    tbody.innerHTML = ''; // Clear existing rows
+                    if (data.success) {
+                        data.data.forEach(student => {
+                            const row = `<tr>
+                                            <td>${student[0]}</td> <!-- std_id -->
+                                            <td>${student[1]}</td> <!-- roll -->
+                                            <td>${student[2]}</td> <!-- std_name -->
+                                            <td>${student[3]}</td> <!-- email -->
+                                            <td>${student[4]}</td> <!-- phone -->
+                                            <td>${student[5]}</td> <!-- address -->
+                                            <td>${student[6]}</td> <!-- gender -->
+                                            <td>${student[7]}</td> <!-- dob -->
+                                            <td>${student[8]}</td> <!-- semester -->
+                                            <td>${student[9]}</td> <!-- dep -->
+                                            <td>${student[10]}</td> <!-- course -->
+                                            <td>${student[11]}</td> <!-- year -->
+                                            <td>${student[12]}</td> <!-- photo -->
+                                        </tr>`;
+                            tbody.innerHTML += row;
+                        });
+                    } else {
+                        alert(data.error || 'No data found.');
+                    }
+                })
+                .catch(err => console.error('Error:', err));
+        });
+
+        // Show all button functionality
+        document.getElementById('showAllButton').addEventListener('click', () => {
+            // Reset select and input fields
+            document.getElementById('searchBy').value = "Select";
+            document.getElementById('searchEntry').value = "";
+
+            // Fetch all data
+            fetch('/search_data')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#studentTable tbody');
+                    tbody.innerHTML = ''; // Clear existing rows
+
+                    if (data.success) {
+                        // Populate table with all data
+                        data.data.forEach(student => {
+                            const row = `<tr>
+                                            <td>${student[0]}</td> <!-- std_id -->
+                                            <td>${student[1]}</td> <!-- roll -->
+                                            <td>${student[2]}</td> <!-- std_name -->
+                                            <td>${student[3]}</td> <!-- email -->
+                                            <td>${student[4]}</td> <!-- phone -->
+                                            <td>${student[5]}</td> <!-- address -->
+                                            <td>${student[6]}</td> <!-- gender -->
+                                            <td>${student[7]}</td> <!-- dob -->
+                                            <td>${student[8]}</td> <!-- semester -->
+                                            <td>${student[9]}</td> <!-- dep -->
+                                            <td>${student[10]}</td> <!-- course -->
+                                            <td>${student[11]}</td> <!-- year -->
+                                            <td>${student[12]}</td> <!-- photo -->
+                                        </tr>`;
+                            tbody.innerHTML += row;
+                        });
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="12">No records found</td></tr>';
+                    }
+                })
+                .catch(err => console.error('Error:', err));
+        });
+
+
+        function fetchStudents() {
+            fetch('/get_students')  // Call the Flask endpoint
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let tableBody = document.querySelector("tbody");
+                        tableBody.innerHTML = ""; // Clear existing rows
+
+                        data.data.forEach(student => {
+                            // Create a new table row for each student
+                            let row = `
+                                <tr>
+                                    <td>${student.std_id}</td>
+                                    <td>${student.roll}</td>
+                                    <td>${student.std_name}</td>
+                                    <td>${student.email}</td>
+                                    <td>${student.phone}</td>
+                                    <td>${student.address}</td>
+                                    <td>${student.gender}</td>
+                                    <td>${student.dob}</td>
+                                    <td>${student.semester}</td>
+                                    <td>${student.dep}</td>
+                                    <td>${student.course}</td>
+                                    <td>${student.year}</td>
+                                    <td>${student.photo}</td>
+                                </tr>
+                            `;
+                            tableBody.innerHTML += row;
+                        });
+                    } else {
+                        console.error(data.error); // Log any errors
+                    }
+                })
+                .catch(err => console.error("Error fetching students:", err));
+        }
+
+        // Fetch students when the page loads
+        window.onload = fetchStudents;
+
+        // Call fetchStudents after a form submission or update
+        document.querySelector('#student-info').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission
+            // Submit form via AJAX (if required), then refresh the table
+            fetchStudents();
+        });
+
+
+        // Take photo samples
+        document.getElementById("photo-yes").addEventListener("change", function() {
+            document.getElementById("take-photo").disabled = false;
+            document.getElementById("update-photo").disabled = false;
+        });
+
+        document.getElementById("photo-no").addEventListener("change", function() {
+            document.getElementById("take-photo").disabled = true;
+            document.getElementById("update-photo").disabled = true;
+        });
+
+        let captureInterval;
+        let photoCount = 0;  
+        let captureLimit = 20; 
+
+        // Open camera on button click
+        document.getElementById("take-photo").addEventListener("click", function() {
+            // Ensure that the camera overlay is displayed
+            document.getElementById("camera-overlay").style.display = "flex";
+            startCamera();
+        });
+
+        // Close camera functionality
+        document.getElementById("closeCameraButton").addEventListener("click", function() {
+            // Hide the camera overlay and stop the video stream
+            document.getElementById("camera-overlay").style.display = "none";
+            const video = document.getElementById("video");
+            video.srcObject.getTracks().forEach(track => track.stop());
+            clearInterval(captureInterval); // Stop the photo capture if it's ongoing
+            alert("Camera closed.");
+        });
+
+        // Capture photos and save them
+        document.getElementById("capture-button").addEventListener("click", function() {
+            // Reset photo count for each new capture session
+            photoCount = 0;
+            
+            // Start capturing photos at intervals
+            captureInterval = setInterval(function() {
+                capturePhoto();
+                photoCount++;
+
+                if (photoCount >= captureLimit) {
+                    clearInterval(captureInterval); // Stop after 50 photos
+                    alert("Captured 20 photos. Closing the camera.");
+                    document.getElementById("camera-overlay").style.display = "none";  // Close camera window
+                    const video = document.getElementById("video");
+                    video.srcObject.getTracks().forEach(track => track.stop());  // Stop video stream
+                }
+            }, 1000);
+        });
+
+        // Start the camera stream
+        function startCamera() {
+            const video = document.getElementById("video");
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    console.log("Camera started successfully.");
+                })
+                .catch(function(error) {
+                    console.error("Error accessing the camera: ", error);
+                    alert("Could not access the camera. Please check your device's camera settings.");
+                });
+        }
+
+        // Capture a single photo
+        function capturePhoto() {
+            const video = document.getElementById("video");
+            const canvas = document.getElementById("canvas");
+            const context = canvas.getContext("2d");
+
+            // Set the canvas dimensions to match the video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Draw the video frame to the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert canvas to Blob and send it to backend
+            canvas.toBlob(function(blob) {
+                if (!blob) {
+                    console.error("Error: Blob creation failed.");
+                    return;
+                }
+
+                const formData = new FormData();
+                const studentId = document.getElementById("std_id").value;
+                const photoNumber = photoCount + 1;  // Start from 1
+                const filename = `${studentId}_${photoNumber}.jpg`;
+
+                // Append data to FormData
+                formData.append("photo", blob, filename);
+                formData.append("photoCount", photoCount);  // Ensure photoCount is sent
+                formData.append("std_id", studentId);  // Send the student ID as form data
+
+                // Debugging: Log FormData to ensure it's correct
+                // console.log("FormData contents:");
+                // formData.forEach((value, key) => {
+                //     console.log(`${key}: ${value}`);
+                // });
+
+                // Send to backend
+                fetch("/save-photo", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                // .then(data => {
+                //     console.log(`Photo ${photoNumber} saved successfully`, data);
+                // })
+                .catch(error => {
+                    console.error("Error while sending the photo:", error);
+                });
+            });
+        }
+
+
+        // Update photo samples functionality
+        const updateButton = document.getElementById("update-photo");
+        const canvas = document.getElementById("canvas");
+        const video = document.getElementById("video");
+
+        updateButton.addEventListener("click", () => {
+            const studentId = document.getElementById("std_id").value;
+            if (!studentId) {
+                alert("Please enter a Student ID.");
+                return;
+            }
+
+            // Step 1: Delete previous photos of the student
+            fetch(`/delete-photos/${studentId}`, {
+                method: "DELETE",
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Previous photos deleted successfully.");
+
+                    // Step 2: Capture new photos
+                    capturePhotos(studentId);
+                } else {
+                    console.error("Error deleting previous photos:", data.error);
+                }
+            })
+            .catch(error => console.error("Error deleting photos:", error));
+        });
+
+        function capturePhotos(studentId) {
+            const intervalId = setInterval(() => {
+                // Draw the video frame on the canvas
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext("2d");
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Convert canvas to a blob and send it to the server
+                canvas.toBlob(blob => {
+                    if (!blob) {
+                        console.error("Error: Blob creation failed.");
+                        return;
+                    }
+
+                    photoCount++;
+                    const filename = `${studentId}.${photoCount}.jpg`;
+
+                    const formData = new FormData();
+                    formData.append("photo", blob, filename);
+                    formData.append("photoCount", photoCount);
+                    formData.append("std_id", studentId);
+
+                    // Send photo to the server
+                    fetch("/save-photo", {
+                        method: "POST",
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(`Photo ${photoCount} saved successfully.`);
+                        if (photoCount >= 10) { // Stop after 10 photos
+                            clearInterval(intervalId);
+                            alert("Photo samples updated successfully!");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error saving photo:", error);
+                        clearInterval(intervalId);
+                    });
+                });
+            }, 1000); // Capture a photo every 1 second
+        }
+
+    </script>
+</body>
+</html>

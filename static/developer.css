@@ -1,0 +1,95 @@
+.main-dev-container{
+    margin: 20px auto;
+    width: 90%;
+}
+.dev-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+    width: 100%;
+    flex-direction: row;
+    height: 300px;
+    gap: 70px;
+}
+.dev-card {
+    width: 240px;
+    height: 250px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    box-shadow: 
+        0 0 10px rgba(8, 43, 71, 0.5), 
+        0 0 20px rgba(8, 43, 71, 0.4),  
+        0 0 40px rgba(8, 43, 71, 0.3),  
+        0 0 80px rgba(8, 43, 71, 0.2);  
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: float 3s ease-in-out infinite; 
+}
+
+/* Hover Effect: Pause animation and apply scaling */
+.dev-card:hover {
+    transform: scale(1.05); /* Apply hover scaling */
+    box-shadow: 
+        0 0 15px rgba(8, 43, 71, 0.6),
+        0 0 30px rgba(8, 43, 71, 0.5),
+        0 0 60px rgba(8, 43, 71, 0.4),
+        0 0 100px rgba(8, 43, 71, 0.3); 
+}
+
+/* Keyframes for floating motion */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0); /* Starting and ending position */
+    }
+    50% {
+        transform: translateY(-20px); /* Move up slightly */
+    }
+}
+
+/* Alternate animation for reverse motion */
+@keyframes float-reverse {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(20px); /* Move down slightly */
+    }
+}
+
+/* Card-specific animations */
+.dev-card:nth-child(odd) {
+    animation-name: float; 
+}
+
+.dev-card:nth-child(even) {
+    animation-name: float-reverse; 
+}
+
+.profile {
+    width: 120px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover; 
+    margin: 10px auto;
+    display: block;
+}
+.social-icon{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.social-icon img{
+    width: 30px;
+}
+.name{
+    font-size: 19px;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px;
+}
+.domain{
+    font-size: 17px;
+    text-align: center;
+    margin-bottom: 10px;
+}

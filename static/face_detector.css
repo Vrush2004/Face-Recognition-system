@@ -1,0 +1,41 @@
+.face-main{
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-image: url("./images/face_recog.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.9; 
+    z-index: -1; 
+    overflow-y:  hidden;
+    position: absolute;
+}
+.face-btn{
+    background-color: #022f47;
+    color: white;
+    border: none;
+    padding: 7px 25px;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 10px;
+    position: fixed;
+    right: 290px;
+    bottom: 42px;
+    box-shadow: 0px 0px 10px 5px rgb(59, 140, 206);
+    animation: glow 0.5s infinite alternate;
+}
+.face-btn:hover{
+    transform: scale(1.05);
+    color: #8ec6ef;
+}
+@keyframes glow {
+    0% {
+        box-shadow: 0px 0px 10px 3px rgb(52, 152, 228);
+        
+    }
+    100% {
+        box-shadow: 0px 0px 20px 6px rgb(72, 164, 235);
+    }
+}

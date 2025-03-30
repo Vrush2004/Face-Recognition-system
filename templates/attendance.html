@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/attendance.css">
+</head>
+<body>
+    <section class="main">
+        <header class="header">
+                <div class="logo-container">
+                    <a href="./index.html">
+                        <img src="../static/images/logo1.png" alt="Logo" class="navbar-logo">
+                    </a>
+                </div>
+                <div class="nav-menu">
+                  <a href="{{ url_for('index') }}">Home</a>
+                  <a href="{{ url_for('about') }}">About</a>
+                  <a href="{{ url_for('dataset')}}">Dataset</a>
+                  <a href="{{ url_for('developer') }}">Developer</a>
+                  <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+        </header>
+        <h1 class="heading">Attendance Dashboard</h1>
+
+        <div class="button-group">
+          <!-- Import CSV Form -->
+          <form id="importForm" enctype="multipart/form-data" method="POST">
+            <!-- Hidden file input -->
+            <input type="file" id="csvFileInput" name="file" accept=".csv" style="display:none;" />
+            
+            <!-- Button that triggers the file input -->
+            <button type="button" id="importCsvButton">Import CSV</button>
+          </form>
+
+          <!-- Export CSV Button -->
+          <button type="button" onclick="window.location.href='/export_csv';">Export CSV</button>
+
+          <a href="{{ url_for('dashboard') }}">
+            <button type="button">Dashboard</button>
+          </a>
+        </div>
+            
+            <!-- Right Section -->
+            <section class="right-section">
+              <h2 class="h2-heading">Attendance Details</h2>
+              <table id="csvTable">
+                <thead>
+                  <tr>
+                    <th>Attendance ID</th>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Time</th>
+                    <th>Date</th>
+                    <th>Attendance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Dynamic rows will go here -->
+                </tbody>
+              </table>
+            </section>
+    </section>
+
+    <script>
+
+      // Function to fetch CSV data from the server
+      function fetchAttendanceData() {
+      fetch('/get_attendance_data')  // Ensure this endpoint serves `attendance_data.csv`
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Failed to fetch CSV file');
+              }
+              return response.text();
+          })
+          .then(data => {
+              parseCSV(data);
+          })
+          .catch(error => console.error('Error fetching attendance data:', error));
+      }
+
+      // Function to parse and display CSV data
+      function parseCSV(contents) {
+        const rows = contents.trim().split('\n');  // Split the file content into rows
+        const tableBody = document.querySelector('#csvTable tbody');
+
+        // Clear any existing rows in the table
+        tableBody.innerHTML = '';
+
+        // Start loop from index 1 to skip the first row (header)
+        for (let i = 1; i < rows.length; i++) {
+            const columns = rows[i].split(',');  // Split the row by commas
+            if (columns.length === 7) { // Ensure correct column count
+                const tr = document.createElement('tr');
+                columns.forEach(column => {
+                    const td = document.createElement('td');
+                    td.textContent = column.trim();
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            }
+        }
+      }
+
+      // Fetch data when the page loads
+      window.onload = fetchAttendanceData;
+      document.addEventListener("DOMContentLoaded", fetchAttendanceData);
+
+      document.getElementById('importCsvButton').addEventListener('click', function() {
+        document.getElementById('csvFileInput').click(); // Opens file selection window
+      });
+
+      document.getElementById('csvFileInput').addEventListener('change', function(event) {
+          const file = event.target.files[0];
+          
+          if (file && file.name.endsWith('.csv')) {
+              const reader = new FileReader();
+              
+              reader.onload = function(e) {
+                  const contents = e.target.result;
+                  parseCSV(contents); // Call function to parse CSV and update the table
+              };
+              
+              reader.readAsText(file);
+          } else {
+              alert('Please select a valid CSV file.');
+          }
+      });
+
+      // Load table data from imported CSV
+      function loadTableData(attendanceData) {
+        let table = document.getElementById('attendanceTable').getElementsByTagName('tbody')[0];
+        table.innerHTML = '';
+        attendanceData.forEach(attendance => {
+          let row = table.insertRow();
+          row.innerHTML = `
+            <td>${attendance.attendanceId}</td>
+            <td>${attendance.rollNo}</td>
+            <td>${attendance.name}</td>
+            <td>${attendance.department}</td>
+            <td>${attendance.time}</td>
+            <td>${attendance.date}</td>
+            <td>${attendance.attendanceStatus}</td>
+          `;
+        });
+      }
+
+    </script>
+</body>
+</html>

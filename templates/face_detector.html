@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/face_detector.css">
+    <style>
+        /* Style for the camera overlay */
+        #camera-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            display: none; /* Initially hidden */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column; /* Stack the elements vertically */
+        }
+
+        /* The video element style */
+        #face-video {
+            width: 640px;
+            height: 480px;
+            border: 2px solid white;
+        }
+
+        /* Button Style */
+        .btn {
+            margin-top: 20px;
+            border-radius: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn.stop {
+            background-color: #f44336; /* Red for stop button */
+        }
+    </style>
+</head>
+<body>
+    <section class="face-main">
+        <header class="header">
+                <div class="logo-container">
+                    <a href="./index.html">
+                        <img src="../static/images/logo1.png" alt="Logo" class="navbar-logo">
+                    </a>
+                </div>
+                <div class="nav-menu">
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('about') }}">About</a>
+                    <a href="{{ url_for('dataset')}}">Dataset</a>
+                    <a href="{{ url_for('developer') }}">Developer</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+        </header>
+        <main>
+            <button class="face-btn">Face Recognizer</button>
+        </main>
+    </section>
+
+    <div id="camera-overlay">
+        <video id="face-video" autoplay></video>
+        <div style="display: flex;">
+            <button class="stop-btn btn stop" style="display:none;">Stop Camera</button>
+            <button class="face-btn btn start" style="display:none;">Start Camera</button>
+        </div>
+    </div>
+    
+    <script>
+        let videoElement = document.getElementById("face-video");
+        let stopButton = document.querySelector(".stop-btn");
+        let startButton = document.querySelector(".face-btn");
+    
+        startButton.addEventListener("click", function () {
+            fetch("/start_camera", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        document.getElementById("camera-overlay").style.display = "flex";
+                        videoElement.src = "/video_feed"; // Start video feed
+                        startButton.style.display = "none"; // Hide start button
+                        stopButton.style.display = "inline-block";
+                    }
+                });
+        });
+    
+        stopButton.addEventListener("click", function () {
+            fetch("/stop_camera", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        document.getElementById("camera-overlay").style.display = "none";
+                        stopButton.style.display = "none"; // Hide stop button
+                        startButton.style.display = "inline-block";
+                    }
+                });
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,104 @@
+
+
+.dataset-container {
+    display: flex;
+    margin: 20px auto;
+    background: transparent;
+    justify-content: space-between;
+    width: 70%;
+    border-radius: 8px;
+    text-align: center;
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.7); */
+}
+.upload-section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 30px;
+    width: 300px;
+    height: 200px;
+    background-color: rgba(182, 208, 226, 0.8);
+    box-shadow: 0 0px 3px rgba(0, 0, 0, 0.7);
+}
+.upload-section:hover{
+    border-radius: 30px;
+    background-color: rgba(182, 208, 226, );
+    transition: 1s ease-in-out;
+    transform: scale(1.05);
+}
+
+h1, h2 {
+    color: #08204F;
+    padding-bottom: 20px;
+}
+
+.upload-section, .view-dataset-section {
+    margin: 10px 0;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+/* Style the custom file upload button */
+.custom-file-upload {
+    display: inline-block;
+    background-color: rgb(107, 156, 190); /* Green background */
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.custom-file-upload:hover{
+    background-color: rgb(68, 124, 165); /* Green background */
+    color: #08204F;
+}
+
+#file-name {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+button {
+    margin-top: 15px;
+    background-color: #0B80A1;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #084d5e;
+}
+
+#dataset-list {
+    width: 70%;  
+    margin: 20px auto;
+    padding: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    background: rgba(182, 208, 226, 0.8);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: none; /* Hidden until the button is clicked */
+}
+#dataset-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+#dataset-list::-webkit-scrollbar-thumb {
+    background-color: #6b93b0;
+    border-radius: 10px;
+}
+
+#dataset-list::-webkit-scrollbar-thumb:hover {
+    background-color: #6b93b0;
+}

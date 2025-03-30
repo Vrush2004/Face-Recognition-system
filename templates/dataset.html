@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dataset.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <a href="./index.html">
+                <img src="../static/images/logo1.png" alt="Logo" class="navbar-logo">
+            </a>
+        </div>
+        <div class="nav-menu">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('dataset')}}" class="focus">Dataset</a>
+            <a href="{{ url_for('developer') }}">Developer</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </header>
+
+    <main class="main">
+        <h1 class="heading">Dataset Management</h1>
+        <section class="dataset-container">
+
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h2>Upload Dataset Folder</h2>
+                <form action="#" method="POST" enctype="multipart/form-data" id="upload-form">
+                    <label for="file-upload" class="custom-file-upload">
+                        Choose Folder
+                    </label>
+                    <input type="file" id="file-upload" name="dataset_folder" webkitdirectory directory multiple>
+                    <button type="submit">Upload</button>
+                    <p id="upload-message"></p>
+                </form>
+            </div>
+
+            <!-- View Dataset Section -->
+            <div class="upload-section view-dataset-section">
+                <h2>View Existing Dataset</h2>
+                <button id="view-dataset-button">View Dataset</button>
+            </div>
+        </section>
+        <div id="dataset-list"></div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    const uploadForm = document.getElementById("upload-form");
+    const fileInput = document.getElementById("file-upload");
+    const viewDatasetButton = document.getElementById("view-dataset-button");
+    const datasetList = document.getElementById("dataset-list");
+
+    // Handle dataset folder upload
+    uploadForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (fileInput.files.length === 0) {
+            alert("Please select a folder to upload.");
+            return;
+        }
+
+        const formData = new FormData();
+        for (const file of fileInput.files) {
+            formData.append("dataset_folder", file);
+        }
+
+        fetch("/upload", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);  // Show alert on success
+            fileInput.value = ""; // Clear file input
+            loadDatasetList(); // Refresh dataset list
+        })
+        .catch(error => {
+            console.error("Upload error:", error);
+            alert("Error uploading folder.");
+        });
+    });
+
+    // Fetch and display dataset folders
+    function loadDatasetList() {
+        fetch("/get-datasets")
+        .then(response => response.json())
+        .then(data => {
+            datasetList.innerHTML = "<h2>Available Datasets</h2>";
+            if (data.folders.length === 0) {
+                datasetList.innerHTML += "<p>No datasets found.</p>";
+                return;
+            }
+            const ul = document.createElement("ul");
+            data.folders.forEach(folder => {
+                const li = document.createElement("li");
+                li.textContent = folder;
+                li.style.cursor = "pointer";
+                li.addEventListener("click", () => loadImages(folder));
+                ul.appendChild(li);
+            });
+            datasetList.appendChild(ul);
+        })
+        .catch(error => console.error("Error loading datasets:", error));
+    }
+
+    // Fetch images of a selected dataset folder
+    function loadImages(folderName) {
+        fetch(`/get-images?folder=${folderName}`)
+        .then(response => response.json())
+        .then(data => {
+            datasetList.innerHTML = `<h2>${folderName} Images</h2>`;
+            const div = document.createElement("div");
+            div.style.display = "flex";
+            div.style.flexWrap = "wrap";
+
+            data.images.forEach(img => {
+                const imgElement = document.createElement("img");
+                imgElement.src = `/data/${folderName}/${img}`;
+                imgElement.style.width = "100px";
+                imgElement.style.margin = "5px";
+                div.appendChild(imgElement);
+            });
+
+            datasetList.appendChild(div);
+        })
+        .catch(error => console.error("Error loading images:", error));
+    }
+
+    document.getElementById("view-dataset-button").addEventListener("click", () => {
+    console.log("Fetching datasets...");
+
+    fetch("/get-datasets")
+        .then(response => response.json())
+        .then(data => {
+            console.log("Dataset Response:", data);
+            const datasetList = document.getElementById("dataset-list");
+            datasetList.innerHTML = "<h2>Available Datasets</h2>";
+            datasetList.style.display = "block";  
+
+            if (Object.keys(data.datasets).length === 0) {
+                datasetList.innerHTML += "<p>No datasets found.</p>";
+                return;
+            }
+
+            const ul = document.createElement("ul");
+            Object.entries(data.datasets).forEach(([folder, images]) => {
+                const li = document.createElement("li");
+                li.innerHTML = `<strong>${folder}</strong><br>`;
+
+                if (images.length > 0) {
+                    images.forEach(image => {
+                        const img = document.createElement("img");
+                        img.src = `/dataset-images/${folder}/${image}`;
+                        img.alt = `Sample from ${folder}`;
+                        img.style.width = "90px";  
+                        img.style.margin = "5px";
+                        li.appendChild(img);
+                    });
+                } else {
+                    li.innerHTML += "<p>No images available</p>";
+                }
+
+                ul.appendChild(li);
+            });
+
+            datasetList.appendChild(ul);
+        })
+        .catch(error => console.error("Error loading datasets:", error));
+});
+
+
+});
+
+    </script>
+</body>
+</html>

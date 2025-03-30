@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Face Recognition System</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/about.css">
+
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="header">
+        <div class="logo-container">
+            <a href="./index.html">
+                <img src="../static/images/logo1.png" alt="Logo" class="navbar-logo">
+            </a>
+        </div>
+        <div class="nav-menu">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('about') }}" class="focus">About</a>
+            <a href="{{ url_for('dataset')}}">Dataset</a>
+            <a href="{{ url_for('developer') }}">Developer</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <h1 class="heading">About the Project</h1>
+        <section class="about-section">
+            <div class="about-content">
+                <p class="info">Welcome to the Face Recognition Attendance Management System! This project is designed to automate attendance using advanced facial recognition techniques. The goal is to eliminate the need for manual attendance-taking and improve accuracy and security for educational institutions, offices, and other organizations.</p>
+            
+                <h2>Project Features:</h2>
+                <ul>
+                    <li>Automated attendance management with real-time facial recognition</li>
+                    <li>Efficient data storage and retrieval in a MySQL database</li>
+                    <li>Increased security with facial authentication for attendance marking</li>
+                    <li>Admin panel for managing attendance records</li>
+                    <li>Real-time processing with OpenCV and machine learning models</li>
+                </ul>
+
+                <h2>Technologies Used:</h2>
+                <ul>
+                    <li>Python (OpenCV, TensorFlow, Keras)</li>
+                    <li>Pre-trained Models : AlexNet, GoogleNet, SqueezeNet</li>
+                    <li>MySQL Database for data storage</li>
+                    <li>HTML, CSS, and JavaScript for the front-end</li>
+                    <li>Machine Learning for facial recognition and prediction</li>
+                </ul>
+
+                <h2>How It Works:</h2>
+                <ul>The system uses a camera to capture live images of users. The captured images are processed, and the face is detected and recognized using machine learning algorithms. Once recognized, the user is marked as present, and the attendance is saved in the database. The system is easy to use and is efficient in managing the attendance process, reducing human error and improving security.</ul>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

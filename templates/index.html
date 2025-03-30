@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <section class="main">
+        <header class="header">
+                <div class="logo-container">
+                    <a href="../templates/index.html">
+                        <img src="../static/images/logo1.png" alt="Logo" class="navbar-logo">
+                    </a>
+                </div>
+                <div class="nav-menu">
+                    <a href="{{ url_for('index') }}" class="focus">Home</a>
+                    <a href="{{ url_for('about') }}">About</a>
+                    <a href="{{ url_for('dataset')}}">Dataset</a>
+                    <a href="{{ url_for('developer') }}">Developer</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+        </header>
+        <main>
+            <h1 class="heading">CampusConnect: Simplifying Attendance for Smarter Classrooms</h1>
+            <div class="container">
+                <div class="card-container">
+                    <a href="{{ url_for('students') }}" class="card">
+                        <img src="../static/images/students4.jpg" alt="">
+                        <button class="btn">Student Details</button>
+                    </a>
+                    <a href="{{ url_for('face_detector') }}" class="card">
+                        <img src="../static/images/face_recognition.jpg" alt="">
+                        <button class="btn">Face Detector</button>
+                    </a>
+                    <a href="{{ url_for('attendance') }}" class="card">
+                        <img src="../static/images/attendance.webp" alt="">
+                        <button class="btn">Attendance Details</button>
+                    </a>
+                    <a href="{{ url_for('train_data') }}" class="card">
+                        <img src="../static/images/train_data.webp" alt="">
+                        <button class="btn">Train Data</button>
+                    </a>
+                </div>
+            </div>
+            <a href="#" class="chatbot-icon" id="chatbot-link">
+                <img src="../static/images/chatbot2.png" alt="Chatbot Icon" width="60">
+            </a>
+        
+            <div id="chatbot-panel">
+                <iframe src="{{ url_for('chatbot') }}"></iframe>
+            </div>
+        </main>
+    </section>
+
+    <script>
+
+        // Check if the user is logged in
+        var isLoggedIn = "{{ session.get('isLoggedIn', False) }}";
+        if (isLoggedIn === "False" || isLoggedIn === "None" || !isLoggedIn) {
+            window.location.href = "{{ url_for('login') }}"; 
+        }
+
+        const chatbotLink = document.getElementById("chatbot-link");
+        const chatbotPanel = document.getElementById("chatbot-panel");
+    
+        chatbotLink.addEventListener("click", (e) => {
+            e.preventDefault(); 
+            chatbotPanel.classList.toggle("open"); 
+        });
+    </script>
+</body>
+</html>

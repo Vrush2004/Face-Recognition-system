@@ -1,0 +1,239 @@
+.main{
+    height: auto;
+    overflow-y:  auto;
+}
+.container {
+    width: 100%;
+    max-width: 1530px;
+    margin: 0 auto;
+}
+.h2-heading{
+    text-align: center;
+    color: #08204F;
+    padding: 5px;
+}
+.main-content {
+    display: flex;
+    justify-content: space-between;
+}
+.left-section {
+    background-color: #B6D0E2;
+    max-height: 500px; /* Set a maximum height for the form */
+    overflow-y: auto;
+    padding: 20px;
+    margin-left: 20px;
+    border-radius: 10px;
+    width: 44%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+.form_info{
+    display: flex;
+    gap: 20px;
+}
+
+.left-img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+input, select {
+    width: 96%;
+    padding: 12px;
+    margin-top: 15px;
+    border: 1px solid #9d9a9a;
+    border-radius: 5px;
+}
+.left-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+.left-section::-webkit-scrollbar-thumb {
+    background-color: #6b93b0;
+    border-radius: 10px;
+}
+
+.left-section::-webkit-scrollbar-thumb:hover {
+    background-color: #6b93b0;
+}
+.photo-sample{
+    display: inline-flex; 
+    align-items: center;  
+    gap: 8px;             
+    flex-wrap: nowrap; 
+}
+.photo-label {
+    display: flex;
+    gap: 5px; /* Adds space between the label and radio buttons */
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #016394;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 50%;
+}
+
+button:hover {
+    background-color: #005482;
+}
+
+.right-frame {
+    width: 46%;
+    background-color: #B6D0E2;
+    border: 2px solid #ccc;
+    margin-right: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    position: relative;
+}
+.search-system {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-system label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-right: 10px;
+}
+
+.search-select, .search-entry {
+    font-size: 14px;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-width: 180px;
+}
+
+.search-btn {
+    font-size: 14px;
+    padding: 8px 15px;
+    background-color: #016394;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100px;
+}
+.btn-container{
+    margin-top: 13px;
+    display: flex;
+    gap: 10px;
+}
+.search-btn:hover {
+    background-color: #014f73;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    margin: 20px 0px;
+}
+
+.table-container::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background-color: #6b93b0;
+    border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #6b93b0;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #005482;
+    border-right: 1px solid #005482;
+    font-size: 14px;
+
+}
+
+th {
+    background-color: #005482;
+    color: white;
+}
+
+td {
+    background-color: #fff;
+}
+#studentTable th:first-child, 
+    #studentTable td:first-child {
+        border-left: none;
+    }
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Overlay style for camera */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Camera container style */
+.camera-container {
+    position: relative;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+/* Close button style */
+#closeCameraButton {
+    padding: 10px 20px;
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#closeCameraButton:hover {
+    background-color: darkred;
+}
+
+.camera-btn-div{
+    display: flex;
+    gap: 20px;
+    height: 40px;
+}

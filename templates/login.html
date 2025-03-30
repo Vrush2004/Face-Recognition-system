@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="../static/login.css">
+</head>
+<body>
+    <section class="login-section">
+        <div class="login-container">
+            <h1 class="login-heading">Login</h1>
+            <form id="login-form" class="login-form" action="{{ url_for('login') }}" method="POST">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="text" id="email" name="email" placeholder="Enter Email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter Password" required>
+                </div>
+                <p class="forgot-pass"><a href="{{ url_for('forgot_password') }}">Forgot your password?</a></p>
+                <div class="btn-container">
+                    <button type="submit" class="login-btn">Login</button>
+                </div>
+            </form>
+            
+            <p class="register">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+        </div>
+    </section>
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            fetch("/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ email, password })
+            })
+            .then(response => {
+                console.log("Response Status:", response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Response Data:", data);
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Fetch Error:", error);
+                alert("Something went wrong. Please try again.");
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='developer.css') }}">
+</head>
+<body>
+    <section class="main">
+        <header class="header">
+                <div class="logo-container">
+                    <a href="./index.html">
+                        <img src="../static/images/logo1.png" alt="Logo" class="navbar-logo">
+                    </a>
+                </div>
+                <div class="nav-menu">
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('about') }}">About</a>
+                    <a href="{{ url_for('dataset')}}">Dataset</a>
+                    <a href="{{ url_for('developer') }}" class="focus">Developer</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+        </header>
+        <main class="main-dev-container">
+            <div class="dev-container">
+                <div class="dev-card">
+                    <img src="../static/images/Vrushali.jpg" alt="" class="profile">
+                    <p class="name">Vrushali Chaube</p>
+                    <p class="domain">Data Analysts</p>
+                    <div class="social-icon">
+                        <a href="https://www.linkedin.com/in/vrushali-chaube-53612a2a5/" target="_blank"><img src="../static/images/linkedin.png" alt=""></a>
+                        <a href="https://github.com/Vrush2004" target="_blank"><img src="../static/images/github.png" alt=""></a>
+                        <a href="mailto:vrushalichaube@gmail.com" target="_blank"><img src="../static/images/email.png" alt=""></a>
+                    </div>
+                </div>
+                <div class="dev-card">
+                    <img src="../static/images//sonali.jpeg" alt="" class="profile">
+                    <p class="name">Sonali Golhar</p>
+                    <p class="domain">.Net Developer | AWS</p>
+                    <div class="social-icon">
+                        <a href="" target="_blank"><img src="../static/images/linkedin.png" alt=""></a>
+                        <a href="" target="_blank"><img src="../static/images/github.png" alt=""></a>
+                        <a href="" target="_blank"><img src="../static/images/email.png" alt=""></a>
+                    </div>
+                </div>
+                <div class="dev-card">
+                    <img src="../static/images/Nishigandha.jpeg" alt="" class="profile">
+                    <p class="name">Nishigandha Kumthekar</p>
+                    <p class="domain">FrontEnd Developer</p>
+                    <div class="social-icon">
+                        <a href="" target="_blank"><img src="../static/images/linkedin.png" alt=""></a>
+                        <a href="" target="_blank"><img src="../static/images/github.png" alt=""></a>
+                        <a href="" target="_blank"><img src="../static/images/email.png" alt=""></a>
+                    </div>
+                </div>
+                <div class="dev-card">
+                    <img src="../static/images/Nikita.jpeg" alt="" class="profile">
+                    <p class="name">Nikita Vyavhare</p>
+                    <p class="domain">Web Development</p>
+                    <div class="social-icon">
+                        <a href="" target="_blank"><img src="../static/images/linkedin.png" alt=""></a>
+                        <a href="" target="_blank"><img src="../static/images/github.png" alt=""></a>
+                        <a href="" target="_blank"><img src="../static/images/email.png" alt=""></a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+</body>
+</html>

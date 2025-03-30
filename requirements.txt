@@ -1,0 +1,12 @@
+opencv-contrib-python
+numpy
+pillow
+transformers
+torch
+mysql-connector-python
+pyjokes
+Flask
+tensorflow
+scikit-learn
+werkzeug
+pandas
