@@ -67,7 +67,7 @@
     </section>
 
     <div id="camera-overlay">
-        <video id="face-video" autoplay></video>
+        <img id="face-video" src="{{ url_for('video_feed') }}" alt="Video Feed">
         <div style="display: flex;">
             <button class="stop-btn btn stop" style="display:none;">Stop Camera</button>
             <button class="face-btn btn start" style="display:none;">Start Camera</button>
@@ -76,8 +76,14 @@
     
     <script>
         let videoElement = document.getElementById("face-video");
-        let stopButton = document.querySelector(".stop-btn");
         let startButton = document.querySelector(".face-btn");
+        let stopButton = document.querySelector(".stop-btn");
+    
+        let successAudio = new Audio("../static/audio/success.mp3");
+        let retryAudio = new Audio("../static/audio/try_again.mp3");
+    
+        let recognitionTimer; // Timer for "Try Again" alert
+        let recognitionInterval; // Interval for checking recognition
     
         startButton.addEventListener("click", function () {
             fetch("/start_camera", { method: "POST" })
@@ -85,9 +91,17 @@
                 .then(data => {
                     if (data.status === "success") {
                         document.getElementById("camera-overlay").style.display = "flex";
-                        videoElement.src = "/video_feed"; // Start video feed
-                        startButton.style.display = "none"; // Hide start button
+                        document.getElementById("face-video").src = "/video_feed"; 
+                        startButton.style.display = "none";
                         stopButton.style.display = "inline-block";
+    
+                        // Start a 10-second timer for "Try Again" alert
+                        recognitionTimer = setTimeout(() => {
+                            retryAudio.play();
+                        }, 10000);
+    
+                        // Start checking for face recognition every 2 seconds
+                        recognitionInterval = setInterval(checkRecognition, 2000);
                     }
                 });
         });
@@ -98,12 +112,48 @@
                 .then(data => {
                     if (data.status === "success") {
                         document.getElementById("camera-overlay").style.display = "none";
-                        stopButton.style.display = "none"; // Hide stop button
+                        stopButton.style.display = "none";
                         startButton.style.display = "inline-block";
+
+                        // Stop checking recognition
+                        clearTimeout(recognitionTimer);
+                        clearInterval(recognitionInterval);
+
+                        // Stop audio playback if running
+                        retryAudio.pause();
+                        retryAudio.currentTime = 0;
+
+                        successAudio.pause();
+                        successAudio.currentTime = 0;
+
+                        // Clear video feed
+                        videoElement.src = "";
+                        videoElement.load();
                     }
                 });
         });
-    </script>
+
+            
+        let lastRecognitionStatus = "";
+
+        function checkRecognition() {
+            fetch("/recognition_status")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "not_recognized") {
+                        retryAudio.play();
+                    } else if (data.status === "recognized") {
+                        successAudio.play();
+                        alert("Attendance Marked Successfully!");
+
+                        clearTimeout(recognitionTimer);
+                        clearInterval(recognitionInterval);  // ✅ Stop checking
+                    }
+                });
+        }
+
+
+    </script>    
     
 </body>
 </html>

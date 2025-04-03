@@ -16,13 +16,13 @@
     background-color: #022f47;
     color: white;
     border: none;
-    padding: 7px 25px;
-    font-size: 20px;
+    padding: 10px 25px;
+    font-size: 22px;
     font-weight: 700;
     border-radius: 10px;
     position: fixed;
     right: 290px;
-    bottom: 42px;
+    bottom: 58px;
     box-shadow: 0px 0px 10px 5px rgb(59, 140, 206);
     animation: glow 0.5s infinite alternate;
 }

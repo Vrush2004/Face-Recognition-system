@@ -26,26 +26,43 @@
         <h1 class="heading">Attendance Dashboard</h1>
 
         <div class="button-group">
-          <!-- Import CSV Form -->
           <form id="importForm" enctype="multipart/form-data" method="POST">
-            <!-- Hidden file input -->
             <input type="file" id="csvFileInput" name="file" accept=".csv" style="display:none;" />
-            
-            <!-- Button that triggers the file input -->
+          
             <button type="button" id="importCsvButton">Import CSV</button>
           </form>
 
-          <!-- Export CSV Button -->
           <button type="button" onclick="window.location.href='/export_csv';">Export CSV</button>
 
           <a href="{{ url_for('dashboard') }}">
             <button type="button">Dashboard</button>
           </a>
         </div>
-            
+       
             <!-- Right Section -->
             <section class="right-section">
-              <h2 class="h2-heading">Attendance Details</h2>
+    
+                <h2 class="h2-heading">Attendance Details</h2>
+                <div class="filters">
+                <div>
+                  <label for="departmentFilter">Department:</label>
+                  <select id="departmentFilter">
+                      <option value="">All </option>
+                      <option value="Computer">Computer</option>
+                      <option value="IT">IT</option>
+                      <option value="E & TC">E & TC</option>
+                      <option value="Civil">Civil</option>
+                      <option value="Mechanical">Mechanical</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label for="dateFilter">Date:</label>
+                  <input type="date" id="dateFilter">
+                </div>
+                
+              </div>
+              
               <table id="csvTable">
                 <thead>
                   <tr>
@@ -121,7 +138,7 @@
               
               reader.onload = function(e) {
                   const contents = e.target.result;
-                  parseCSV(contents); // Call function to parse CSV and update the table
+                  parseCSV(contents); 
               };
               
               reader.readAsText(file);
@@ -130,7 +147,6 @@
           }
       });
 
-      // Load table data from imported CSV
       function loadTableData(attendanceData) {
         let table = document.getElementById('attendanceTable').getElementsByTagName('tbody')[0];
         table.innerHTML = '';
@@ -147,6 +163,57 @@
           `;
         });
       }
+
+      document.addEventListener("DOMContentLoaded", function () {
+      const departmentFilter = document.getElementById("departmentFilter");
+      const dateFilter = document.getElementById("dateFilter");
+
+      // Add event listeners for filters
+      departmentFilter.addEventListener("change", applyFilters);
+      dateFilter.addEventListener("change", applyFilters);
+
+      function applyFilters() {
+          const selectedDepartment = departmentFilter.value.trim();
+          const selectedDate = dateFilter.value.trim();  // YYYY-MM-DD
+
+          // Convert selected date from YYYY-MM-DD to DD/MM/YYYY
+          const formattedSelectedDate = selectedDate ? selectedDate.split("-").reverse().join("/") : "";
+
+          fetch("/get_attendance_data")
+              .then(response => response.text())
+              .then(data => {
+                  const rows = data.trim().split("\n");
+                  const headers = rows[0];
+                  const filteredRows = rows.slice(1).filter(row => {
+                      const columns = row.split(",").map(col => col.trim());
+
+                      if (columns.length < 6) {
+                          console.warn("Skipping invalid row:", row);
+                          return false;
+                      }
+
+                      const department = columns[3] || "";  // Department column
+                      const date = columns[5] || "";        // Stored as DD/MM/YYYY in CSV
+
+                      const matchesDepartment = selectedDepartment === "" || department === selectedDepartment;
+                      const matchesDate = formattedSelectedDate === "" || date === formattedSelectedDate;
+
+                      return matchesDepartment && matchesDate;
+                  });
+
+                  if (filteredRows.length > 0) {
+                      parseCSV([headers].concat(filteredRows).join("\n"));
+                  } else {
+                      document.querySelector("#csvTable tbody").innerHTML = `<tr><td colspan="7">No matching records found</td></tr>`;
+                  }
+              })
+              .catch(error => console.error("Error filtering attendance data:", error));
+            }
+        });
+
+
+      window.onload = fetchAttendanceData;
+      document.addEventListener("DOMContentLoaded", fetchAttendanceData);
 
     </script>
 </body>

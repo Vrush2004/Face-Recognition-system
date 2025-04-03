@@ -24,11 +24,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import csv
 
-
 chatbot_res = ChatbotResponse()
 
-# Initialize the webcam
 video_cap = cv2.VideoCapture(0)
+last_recognition_status = "not_recognized"
 
 app = Flask(__name__)
 app.secret_key = 'vrush_chaube_734'
@@ -39,7 +38,6 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Database connection function
 def get_db_connection():
     return mysql.connector.connect(
         host="localhost",
@@ -52,9 +50,9 @@ def get_db_connection():
 @app.route('/')
 def index():
     if 'isLoggedIn' in session and session['isLoggedIn']:
-        return render_template('index.html')  # Show the main page
+        return render_template('index.html') 
     else:
-        return redirect(url_for('login'))  # Redirect to login page
+        return redirect(url_for('login'))  
 
 ######################## developer page
 @app.route("/developer")
@@ -85,12 +83,11 @@ def chat():
         if not user_input:
             return jsonify({"error": "No input provided"}), 400  
 
-        # Get chatbot response
         response = chatbot_res.get_response(user_input)
         return jsonify({"response": response})  
 
     except Exception as e:
-        print("Error:", e)  # Log error for debugging
+        print("Error:", e)  
         return jsonify({"error": "An error occurred on the server"}), 500
 
 # ################ Train_data page
@@ -124,8 +121,8 @@ def get_datasets():
 
     for folder in folders:
         folder_path = os.path.join(UPLOAD_FOLDER, folder)
-        images = [img for img in os.listdir(folder_path) if img.endswith((".png", ".jpg", ".jpeg"))][:10]  # Get first 10 images
-        dataset_info[folder] = images  # Store all image names
+        images = [img for img in os.listdir(folder_path) if img.endswith((".png", ".jpg", ".jpeg"))][:10] 
+        dataset_info[folder] = images  
 
     return jsonify({"datasets": dataset_info})
 
@@ -149,12 +146,42 @@ def get_images():
 def students():
     return render_template('students.html')
 
+import csv
+import os
+
+STUDENT_CSV_FILE = os.path.join(os.getcwd(), 'students_data.csv')  
+ATTENDANCE_FILE = os.path.join(os.getcwd(), 'attendance_data.csv') 
+
+def save_all_students_to_csv():
+    """Fetch all student data from the database and write to students_data.csv (DOES NOT MODIFY attendance.csv)."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT std_id, roll, std_name, email, phone, address, gender, dob, dep, course, year, semester, photo FROM student")
+        students = cursor.fetchall()
+
+        with open(STUDENT_CSV_FILE, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(["StudentID", "RollNo", "Name", "Email", "Phone", "Address", "Gender", "DOB", "Department", "Course", "Year", "Semester", "PhotoSamples"])
+            writer.writerows(students)  
+
+        print(f"Student data successfully saved to {STUDENT_CSV_FILE}")
+
+    except Exception as e:
+        print(f"Error saving student data to CSV: {str(e)}")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 @app.route('/add_data', methods=['POST'])
 def add_data():
-    conn = None
+    """Add a student record to the database and update students_data.csv (DOES NOT AFFECT attendance.csv)."""
     try:
-        # Fetch JSON data
-        data = request.get_json()  # This will retrieve the JSON data
+        data = request.get_json()
         std_id = data.get('std_id')
         roll = data.get('roll')
         std_name = data.get('std_name')
@@ -169,11 +196,9 @@ def add_data():
         semester = data.get('semester')
         photo = data.get('photo', 'no')
 
-        # Validate inputs
         if not std_id or not roll:
             return jsonify({"error": "Student ID and Roll are required!"}), 400
 
-        # Insert into the database
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -183,8 +208,11 @@ def add_data():
         )
         conn.commit()
 
+        save_all_students_to_csv()
+
         return jsonify({
             'success': True,
+            'message': f"Student {std_name} added successfully!",
             'student': {
                 'std_id': std_id,
                 'roll': roll,
@@ -204,24 +232,23 @@ def add_data():
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
     finally:
         if conn:
             conn.close()
-
 
 @app.route('/get_students', methods=['GET'])
 def get_students():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM student")  # Fetch all student data
+        cursor.execute("SELECT * FROM student")  
         students = cursor.fetchall()
         conn.close()
 
-        # Structure the data for the frontend
         student_data = [
             {
-                "std_id": student[0],        # Adjust based on your DB columns
+                "std_id": student[0],        
                 "roll": student[1],
                 "std_name": student[2],
                 "email": student[3],
@@ -240,7 +267,7 @@ def get_students():
         return jsonify({"success": True, "data": student_data})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
-
+save_all_students_to_csv()
         
 @app.route('/generate_dataset', methods=['POST'])
 def generate_dataset():
@@ -250,7 +277,6 @@ def generate_dataset():
             flash("Student ID is required!", "error")
             return redirect(url_for('index'))
 
-        # Initialize OpenCV for face detection
         face_classifier = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
         cap = cv2.VideoCapture(0)
         img_id = 0
@@ -292,36 +318,30 @@ def fetch_data():
     data = my_cursor.fetchall()
     conn.close()
 
-    # Return the student data to the HTML template
     return render_template('index.html', students=data)
 
 
 @app.route('/search_data', methods=['GET', 'POST'])
 def search_data():
-    # Get query parameters
-    search_by = request.args.get('searchBy')  # Use `args` for GET requests
+    search_by = request.args.get('searchBy')  
     search_value = request.args.get('searchTerm')
 
     try:
         conn = get_db_connection()
         my_cursor = conn.cursor()
 
-        # If no search criteria is provided, return all data (Show All functionality)
         if not search_by and not search_value:
             my_cursor.execute("SELECT * FROM student")
             data = my_cursor.fetchall()
             conn.close()
             return jsonify({"success": True, "data": data})
 
-        # Handle invalid search criteria
         if search_by == "Select":
             return jsonify({"error": "Please select a search criterion."})
 
-        # Handle empty search value
         if not search_value:
             return jsonify({"error": "Please enter a value to search."})
 
-        # Perform search based on criteria
         if search_by == "RollNo":
             my_cursor.execute("SELECT * FROM student WHERE Roll=%s", (search_value,))
         elif search_by == "Phone No":
@@ -329,7 +349,6 @@ def search_data():
         else:
             return jsonify({"error": "Invalid search criterion."})
 
-        # Fetch and return search results
         data = my_cursor.fetchall()
         conn.close()
 
@@ -370,7 +389,6 @@ def update_data():
     try:
         data = request.get_json()
 
-        # Extract the data
         std_id = data.get('std_id')
         roll = data.get('roll')
         std_name = data.get('std_name')
@@ -388,7 +406,6 @@ def update_data():
         if dep == "Select Department" or not std_name or not std_id or not email or not roll:
             return jsonify({"error": "All Fields are required."})
 
-        # Connect to the database
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(""" 
@@ -399,11 +416,9 @@ def update_data():
 
         conn.commit()
 
-        # Check if the update affected any rows
         if cursor.rowcount == 0:
             return jsonify({"error": "No student found with the provided ID or no changes were made."})
 
-        # Fetch the updated student data
         cursor.execute("SELECT * FROM student WHERE std_id=%s", (std_id,))
         updated_student = cursor.fetchone()
 
@@ -438,11 +453,9 @@ def update_data():
 @app.route('/delete_data/<int:std_id>', methods=['DELETE'])
 def delete_data(std_id):
     try:
-        # Connect to the database
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Delete the student from the database
         cursor.execute('DELETE FROM student WHERE std_id = %s', (std_id,))
         conn.commit()
         conn.close()
@@ -456,7 +469,6 @@ def delete_data(std_id):
 @app.route('/reset_data', methods=['POST'])
 def reset_data():
     try:
-        # Reset the values to default values as specified
         reset_values = {
             'std_name': "",
             'std_id': "",
@@ -473,7 +485,7 @@ def reset_data():
             'radio1': ""
         }
 
-        return jsonify(reset_values)  # Send the reset values as JSON response
+        return jsonify(reset_values) 
     except Exception as e:
         return jsonify({"error": f"Due to: {str(e)}"})
 
@@ -495,7 +507,6 @@ def register():
         password = request.form.get('password')
         conf_password = request.form.get('c_password')
 
-        # Validation checks
         if not name or not email or securityQ == "Select":
             flash("All fields are required", "danger")
             return redirect(url_for('register'))
@@ -507,14 +518,12 @@ def register():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Check if the user already exists
         cur.execute("SELECT * FROM register WHERE email=%s", (email,))
         user = cur.fetchone()
         if user:
             flash("User already exists!", "danger")
             return redirect(url_for('register'))
 
-        # Insert new user
         cur.execute(
             "INSERT INTO register (Name, Email, Contact, SecurityQ, SecurityA, Password) "
             "VALUES (%s, %s, %s, %s, %s, %s)",
@@ -550,7 +559,7 @@ def login():
             row = cur.fetchone()
             cur.close()
 
-            if row and row[0] == password:  # If passwords are stored in plaintext
+            if row and row[0] == password: 
                 session['isLoggedIn'] = True
                 session['user_email'] = email
                 session.modified = True
@@ -558,7 +567,7 @@ def login():
             else:
                 return jsonify({"success": False, "message": "Invalid Username & Password"})
         except Exception as e:
-            print("Error in login:", str(e))  # Log error in terminal
+            print("Error in login:", str(e))  
             return jsonify({"success": False, "message": "Something went wrong"})
 
     return render_template('login.html')
@@ -571,13 +580,11 @@ def logout():
     return redirect(url_for('login'))
 
 ################################# forgot password page
-# Temporary storage for reset tokens
 reset_tokens = {}
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        # Handle the form submission
         email = request.form.get('email')
         question = request.form.get('SecurityQ')
         answer = request.form.get('SecurityA')
@@ -598,31 +605,27 @@ def forgot_password():
             return jsonify({"success": False, "message": f"Database error: {e}"})
 
         if row:
-            reset_token = secrets.token_urlsafe(16)  # Generate a unique token
-            reset_tokens[email] = reset_token  # Store token temporarily
+            reset_token = secrets.token_urlsafe(16)  
+            reset_tokens[email] = reset_token 
 
             reset_link = f"http://127.0.0.1:5000/reset_password?token={reset_token}&email={email}"
 
-            # Send email (Mock)
             send_email(email, reset_link)
 
             return jsonify({"success": True, "message": "Password reset link sent to your email!"})
         else:
             return jsonify({"success": False, "message": "Invalid email or security answer."})
 
-    # If it's a GET request, show the password reset request form
     return render_template('forgot_password.html')
 
 
 def send_email(to_email, reset_link):
-    from_email = "vrushalichaube@gmail.com"  # Replace with your email
-    from_password = 'print("Vru143")'  # Replace with your email password
+    from_email = ""  
+    from_password = ''
 
-    # Set up the email content
     subject = "Password Reset Request"
     body = f"Click the following link to reset your password: {reset_link}"
 
-    # Create the email
     msg = MIMEMultipart()
     msg['From'] = from_email
     msg['To'] = to_email
@@ -630,7 +633,7 @@ def send_email(to_email, reset_link):
     msg.attach(MIMEText(body, 'plain'))
 
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)  # Use the appropriate SMTP server
+        server = smtplib.SMTP('smtp.gmail.com', 587)  
         server.starttls()
         server.login(from_email, from_password)
         text = msg.as_string()
@@ -656,7 +659,7 @@ def reset_password():
             cur.close()
             conn.close()
 
-            del reset_tokens[email]  # Remove token after use
+            del reset_tokens[email] 
             flash("Password reset successfully! You can now login.", "success")
             return redirect(url_for('login'))
         else:
@@ -673,7 +676,7 @@ def face_detector():
 
 UPLOAD_FOLDER = 'data'
 MODEL_PATH = 'face_recognition_googlenet_model.h5'
-ATTENDANCE_FILE = "attendance_data.csv"
+camera_active = False  
 
 model = load_model(MODEL_PATH)
 
@@ -687,7 +690,7 @@ label_encoder.fit(students)
 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-cap = None  # Define global variable for video capture
+cap = None  
 
 def get_student_details(student_id):
     """Fetch student details from the database."""
@@ -698,7 +701,9 @@ def get_student_details(student_id):
     return result if result else ("Unknown", "Unknown", "Unknown")
 
 def mark_attendance(student_id):
-    """Mark student attendance in the CSV file."""
+    """Mark student attendance in the CSV file and update recognition status."""
+    global last_recognition_status 
+
     roll, name, department = get_student_details(student_id)
 
     if roll != "Unknown":
@@ -720,33 +725,34 @@ def mark_attendance(student_id):
                 with open(ATTENDANCE_FILE, "a") as f:
                     f.write(f"{student_id},{roll},{name},{department},{time},{date},Present\n")
 
+                last_recognition_status = {
+                    "status": "recognized",
+                    "id": student_id
+                }
+
         except pd.errors.EmptyDataError:
             print("Warning: Attendance file is empty. Initializing with headers.")
             df = pd.DataFrame(columns=["Student ID", "Roll", "Name", "Department", "Time", "Date", "Status"])
             df.to_csv(ATTENDANCE_FILE, index=False)
+    
+    else:
+        last_recognition_status = {"status": "unrecognized"} 
 
 @app.route('/video_feed')
 def video_feed():
     """Handle real-time video feed with face recognition."""
-    global cap
+    global cap, camera_active
     if cap is None or not cap.isOpened():
-        print("Starting camera...")
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
-            print("Error: Could not open camera.")
             return Response("Error: Could not open camera.", status=500)
 
     def generate():
-        """Generate frames from the video stream."""
-        while True:
-            if cap is None or not cap.isOpened():
-                print("Error: Camera not available.")
-                break  # Stop the stream if the camera is not available
-
+        global camera_active
+        while camera_active:
             ret, frame = cap.read()
             if not ret:
-                print("Error: Failed to capture frame")
-                break  # Stop if no frame is captured
+                break
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
@@ -760,32 +766,38 @@ def video_feed():
 
                 predictions = model.predict(face)
                 predicted_class = np.argmax(predictions)
-                confidence = predictions[0][predicted_class]
+                confidence = predictions[0][predicted_class]   
 
                 if confidence > 0.90:
                     student_id = label_encoder.inverse_transform([predicted_class])[0]
-                    roll, name, department = get_student_details(student_id)
                     mark_attendance(student_id)
+                    
+                    global last_recognition_status
+                    last_recognition_status = "recognized" 
 
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                    text = f"{name} | {roll} | {department}"
-                    cv2.putText(frame, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                    cv2.putText(frame, f"ID: {student_id}", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
 
             ret, jpeg = cv2.imencode('.jpg', frame)
             if not ret:
-                print("Error: Could not encode frame")
                 break
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n')
 
     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route("/recognition_status")
+def recognition_status():
+    global last_recognition_status
+    return jsonify({"status": last_recognition_status})
+
 @app.route('/start_camera', methods=['POST'])
 def start_camera():
     """Start the camera feed."""
-    global cap
+    global cap, camera_active
+    camera_active = True
     if cap is None or not cap.isOpened():
-        print("Starting camera...")
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
             return jsonify({"status": "error", "message": "Failed to start camera"}), 500
@@ -794,17 +806,16 @@ def start_camera():
 @app.route('/stop_camera', methods=['POST'])
 def stop_camera():
     """Stop the camera feed and release resources properly."""
-    global cap
+    global cap, camera_active
+    camera_active = False  
+
     if cap is not None and cap.isOpened():
-        print("Stopping camera...")
-        time.sleep(1)  # Adding a small delay to ensure camera has fully started before stopping
         cap.release()
+        cap = None
         cv2.destroyAllWindows()
-        cap = None  # Reset the camera object
 
     return jsonify({"status": "success", "message": "Camera stopped"})
 
-# Function to check allowed file extensions
 def allowed_file(filename, allowed_extensions={'jpg', 'jpeg', 'png'}):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
@@ -821,20 +832,16 @@ def save_photo():
             print("No selected file.")
             return jsonify({"error": "No selected file"}), 400
 
-        # Get photoCount from the request (use default 0 if not provided)
-        photoCount = int(request.form.get('photoCount', 0))  # Default to 0 if not provided
+        photoCount = int(request.form.get('photoCount', 0))  
         
         if photo and allowed_file(photo.filename):
-            # Dynamically create a folder using the student ID
             student_id = request.form['std_id']
             student_folder = os.path.join(UPLOAD_FOLDER, f"Student-{student_id}")
-            os.makedirs(student_folder, exist_ok=True)  # Create the folder if it doesn't exist
+            os.makedirs(student_folder, exist_ok=True)  
             
-            # Set the filename and the full path
             filename = secure_filename(f"{student_id}-{photoCount + 1}.jpg")
             filepath = os.path.join(student_folder, filename)
 
-            # Save the photo in the student's folder
             photo.save(filepath)
 
             return jsonify({"message": f"Photo {filename} saved successfully!"}), 200
@@ -843,7 +850,6 @@ def save_photo():
             return jsonify({"error": "Invalid file format"}), 400
 
     except Exception as e:
-        # Capture the exception and print it to the log for debugging
         print(f"Error: {str(e)}")
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
@@ -852,7 +858,6 @@ def delete_photos(std_id):
     student_folder = os.path.join(UPLOAD_FOLDER, std_id)
 
     if os.path.exists(student_folder):
-        # Delete all files in the student's folder
         for file in os.listdir(student_folder):
             file_path = os.path.join(student_folder, file)
             try:
@@ -860,11 +865,9 @@ def delete_photos(std_id):
             except Exception as e:
                 return jsonify({"success": False, "error": str(e)})
 
-        # Optionally, remove the folder if empty
         try:
             os.rmdir(student_folder)
         except OSError as e:
-            # Ignore errors if the folder is not empty
             pass
 
         return jsonify({"success": True, "message": "Photos deleted successfully."})
@@ -874,7 +877,6 @@ def delete_photos(std_id):
 
 # ####################### Attendance page
 
-# In-memory "database" for attendance (replace with a real database if needed)
 attendance_data = []
 
 @app.route("/dashboard")
@@ -892,23 +894,19 @@ if not os.path.exists(CSV_FILE):
 @app.route('/import_csv', methods=['POST'])
 def import_csv():
     try:
-        # Check if the post request has the file part
         if 'file' not in request.files:
             return jsonify({'status': 'Error', 'message': 'No file part'})
         
         file = request.files['file']
         
-        # If no file is selected
         if file.filename == '':
             return jsonify({'status': 'Error', 'message': 'No selected file'})
 
-        # If the file is allowed
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
             
-            # Read CSV and parse to add to the in-memory attendance data
             df = pd.read_csv(file_path)
             for index, row in df.iterrows():
                 new_attendance = {
@@ -929,7 +927,6 @@ def import_csv():
     except Exception as e:
         return jsonify({'status': 'Error', 'message': str(e)})
 
-# Route to return CSV data as text
 @app.route('/get_attendance')
 def get_attendance():
     try:

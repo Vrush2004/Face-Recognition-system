@@ -4,3 +4,4 @@
 /venv
 __pycache__/
 attendance_data.csv
+students_data.csv
